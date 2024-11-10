@@ -1,5 +1,9 @@
 import statistics
 import random
+import requests
+import os
+from dotenv import load_dotenv
+load_dotenv()
 
 
 def _exit_program():
@@ -17,6 +21,32 @@ class MovieApp:
     def __init__(self, storage):
         """Initializes MovieApp with storage objects"""
         self._storage = storage
+        self.api_key = os.getenv('API_KEY')
+        if not self.api_key:
+            raise ValueError("API_KEY not found. Check .env file")
+
+    def _fetcher(self, title):
+        """Fetching movie details from OMDb API"""
+        api_url = f"http://www.omdbapi.com/?t={title}&apikey={self.api_key}"
+        try:
+            response = requests.get(api_url)
+            response.raise_for_status()
+            movie_data = response.json()
+            if movie_data.get("Response") == "False":
+                print(f"Movie '{title}' not found in OMDb.")
+                return None
+
+            movie_details = {
+                "title": movie_data.get("Title"),
+                "year": movie_data.get("Year"),
+                "rating": float(movie_data.get("imdbRating", 0)),
+                "poster": movie_data.get("Poster")
+            }
+            return movie_details
+
+        except requests.exceptions.RequestException as h:
+            print(f"Error! {h}")
+            return None
 
     def _list_movies(self):
         """1. Listing all the movies"""
@@ -31,34 +61,28 @@ class MovieApp:
             print(f"{movie} ({year}): {rating}")
 
     def _add_movie(self):
-        """Adding a new movie and its details in the database
-         checking if the movie doesn't already exist before continuing"""
-        movies = self._storage.get_movies()
+        """Adding Movie provided by the user
+         fetching Movie details from OMDb API"""
         while True:
-            add_name = input("Please enter the name of the movie u wanna add: ")
-            if len(add_name) == 0:
+            title = input("Please enter title of the Movie: ")
+            if len(title) == 0:
                 print("Movie title can not be empty")
 
-            elif add_name in movies:
-                print(f"Movie {add_name} already exist in the database ")
-
             else:
-                while True:
-                    try:
-                        add_rating = float(input("Please enter it's rating: "))
-                        break
-                    except ValueError:
-                        print("Invalid input! Please enter a number")
-                while True:
-                    try:
-                        add_year = int(input("Please enter the year of the movie: "))
-                        break
-                    except ValueError:
-                        print("Invalid input! Year should be a number")
-                poster = input("Enter poster name: ")  # optional for now
-                self._storage.add_movie(add_name, add_year, add_rating, poster)
-                print(f"\nMovie {add_name} successfully added to the database")
-                break
+                movie_details = self._fetcher(title)
+
+                if movie_details:
+                    # Save to storage
+                    self._storage.add_movie(
+                        movie_details["title"],
+                        movie_details["year"],
+                        movie_details["rating"],
+                        movie_details["poster"]
+                        )
+                    print(f"\nMovie {title} successfully added to the database")
+                    break
+                else:
+                    print("Could not add Movie. Try again!")
 
     def _delete_movie(self):
         """3. Deleting a movie, if the movie only exists."""
