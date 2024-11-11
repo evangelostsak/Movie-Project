@@ -1,6 +1,5 @@
 import argparse
 import os.path
-
 from movie_app import MovieApp
 from storage.storage_json import StorageJson
 from storage.storage_csv import StorageCsv
@@ -11,14 +10,18 @@ def main():
     both with command line arguments
     and standard IDE RUN"""
     parser = argparse.ArgumentParser(description="Run the Movie App with a specified storage file")
-    parser.add_argument("storage_file", nargs="?", default="data/movies.json",
+    parser.add_argument("storage_file", nargs="?", default="movies.json",
                         help="Specify the storage file (JSON or CSV)")
 
     args = parser.parse_args()
     storage_file = args.storage_file
 
     # Ensures generated storage file is saved in 'data' dir
-    storage_file = os.path.join("data", storage_file)
+    if not os.path.isabs(storage_file):
+        storage_file = os.path.join("data", storage_file)
+
+    # Ensures the user gets a data dir if none is existing
+    os.makedirs("data", exist_ok=True)
 
     # Extension-based storage
     if storage_file.endswith('.json'):
