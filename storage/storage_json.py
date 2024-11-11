@@ -1,11 +1,10 @@
-from istorage import IStorage
+from storage.istorage import IStorage
 import json
 
 
 class StorageJson(IStorage):
     def __init__(self, file_path):
         """Initializes the storage path to the json file"""
-
         self.file_path = file_path
 
     def get_movies(self):
