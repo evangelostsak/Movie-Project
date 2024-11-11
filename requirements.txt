@@ -6,3 +6,5 @@ requests
 #json
 #csv
 #  abc, abstractmethod
+
+#***OMDb API key needed, get one and use in movie_app.py***
