@@ -185,6 +185,34 @@ class MovieApp:
         for movie, details in movies_sorting:
             print(f"{movie} rated at: {details["rating"]}, made in {details["year"]}")
 
+    def _generate_website(self):
+        """Generate a website with the Movie's in our list"""
+        with open("_static/index_template.html", "r", encoding="utf-8") as template_file:
+            template = template_file.read()  # Loading the HTML file
+
+            movies = self._storage.list_movies()
+            movie_grid_html = ""
+            for title, details in movies.items():  # Generating the movie grid
+                movie_html = f"""
+            <li>
+                <div class="movie">
+                    <img class="movie-poster" src="{details['poster']}" alt="Poster for {title}">
+                    <div class="movie-title">{title}</div>
+                    <div class="movie-year">Year: {details['year']}</div>
+                    <div class="movie-year">Rating: {details['rating']}</div>
+                </div>
+            </li>
+            """
+                movie_grid_html += movie_html
+
+                show_content_html = template.replace("__TEMPLATE_TITLE__", "Movie Project")
+                show_content_html = show_content_html.replace("__TEMPLATE_MOVIE_GRID__", movie_grid_html)
+
+                with open("index.html", "w") as target_file:  # writing the index.html
+                    target_file.write(show_content_html)
+
+        print("Website was generated successfully!")
+
     def run(self):
         """Command data structure, user picks a number of the action he wants to do
         Program is always running and updating with the users decisions.
@@ -201,7 +229,8 @@ class MovieApp:
             6: self._random_movie,
             7: self._search_movie,
             8: self._rating_sorted_movies,
-            9: self._year_sorted_movies
+            9: self._year_sorted_movies,
+            10: self._generate_website
         }
 
         while True:
@@ -218,10 +247,11 @@ class MovieApp:
             print("7. Search movie")
             print("8. Movies sorted by rating")
             print("9. Movies sorted by year")
+            print("10. Generate Webpage")
             print("")
             try:
 
-                user_input = int(input("Enter Choice (0-9): "))
+                user_input = int(input("Enter Choice (0-10): "))
                 print("")
 
                 if user_input in menu_actions:
@@ -233,7 +263,7 @@ class MovieApp:
                     if user_input == 0:
                         break
                 else:
-                    print("Invalid choice, please enter a number between 0 and 9.")
+                    print("Invalid choice, please enter a number between 0 and 10.")
                     _press_to_continue()
 
             except ValueError:
