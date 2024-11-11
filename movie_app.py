@@ -208,7 +208,7 @@ class MovieApp:
                 show_content_html = template.replace("__TEMPLATE_TITLE__", "Movie Project")
                 show_content_html = show_content_html.replace("__TEMPLATE_MOVIE_GRID__", movie_grid_html)
 
-                with open("index.html", "w") as target_file:  # writing the index.html
+                with open("data/index.html", "w") as target_file:  # writing the index.html
                     target_file.write(show_content_html)
 
         print("Website was generated successfully!")
