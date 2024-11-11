@@ -9,7 +9,7 @@ class StorageCsv(IStorage):
         self.file_path = file_path
         if not os.path.exists(self.file_path):
             with open(self.file_path, mode='w', newline='') as file:
-                fieldnames = ["title", "year", "rating"]
+                fieldnames = ["title", "year", "rating", "poster", "note", "link"]
                 writer = csv.DictWriter(file, fieldnames=fieldnames)
                 writer.writeheader()
 
@@ -30,7 +30,9 @@ class StorageCsv(IStorage):
                                 movies[title] = {
                                     "year": int(row.get("year", 0)),
                                     "rating": float(row.get("rating", 0.0)),
-                                    "poster": row.get("poster", "")
+                                    "poster": row.get("poster", ""),
+                                    "note": row.get("note", ""),
+                                    "link": row.get("link", "")
                                 }
             return movies
         except FileNotFoundError:
@@ -40,24 +42,26 @@ class StorageCsv(IStorage):
     def save_movies(self, data):
         """Saves the movie database to CSV file"""
         with open(self.file_path, mode='w', newline='') as file:
-            fieldnames = ["title", "year", "rating", "poster"]
+            fieldnames = ["title", "year", "rating", "poster", "note", "link"]
             writer = csv.DictWriter(file, fieldnames=fieldnames)
             writer.writeheader()
             for title, details in data.items():
                 writer.writerow({"title": title,
                                  "year": details["year"],
                                  "rating": details["rating"],
-                                 "poster": details["poster"]
+                                 "poster": details["poster"],
+                                 "note": details["note"],
+                                 "link": details["link"]
                                  })
 
     def list_movies(self):
         """Returns dict of movies from the csv file"""
         return self.get_movies()
 
-    def add_movie(self, title, year, rating, poster):
+    def add_movie(self, title, year, rating, poster, link):
         """Adds movie to the CSV file"""
         movies = self.get_movies()
-        movies[title] = {"year": year, "rating": rating, "poster": poster}
+        movies[title] = {"year": year, "rating": rating, "poster": poster, "note": "", "link": link}
         self.save_movies(movies)
 
     def delete_movie(self, title):
@@ -70,12 +74,12 @@ class StorageCsv(IStorage):
         else:
             print(f"No movie with title '{title}' found in the database")
 
-    def update_movie(self, title, rating):
-        """Updates a movie's rating in the CSV database"""
+    def update_movie(self, title, note):
+        """Updates a movie's note in the CSV database"""
         movies = self.get_movies()
         if title in movies:
-            movies[title]["rating"] = rating
-            print(f"Rating for '{title}' is successfully updated")
+            movies[title]["note"] = note
+            print(f"Note for '{title}' is successfully updated")
             self.save_movies(movies)
 
         else:

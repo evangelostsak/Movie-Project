@@ -25,10 +25,10 @@ class StorageJson(IStorage):
         """Returns a dic of the movies."""
         return self.get_movies()
 
-    def add_movie(self, title, year, rating, poster):
+    def add_movie(self, title, year, rating, poster, link):
         """Adds a movie to JSON database."""
         movies = self.get_movies()
-        movies[title] = {"year": year, "rating": rating, "poster": poster}
+        movies[title] = {"year": year, "rating": rating, "poster": poster, "note": "", "link": link}
         self.save_movies(movies)
 
     def delete_movie(self, title):
@@ -41,12 +41,12 @@ class StorageJson(IStorage):
         else:
             print(f"No movie with title '{title}' found in the database")
 
-    def update_movie(self, title, rating):
-        """Updates a movie's rating in the JSON database."""
+    def update_movie(self, title, note):
+        """Updates a movie's note in the JSON database."""
         movies = self.get_movies()
         if title in movies:
-            movies[title]["rating"] = rating
-            print(f"Rating for '{title}' is successfully updated")
+            movies[title]["note"] = note
+            print(f"Note for '{title}' is successfully updated")
             self.save_movies(movies)
 
         else:
