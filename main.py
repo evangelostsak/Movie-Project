@@ -1,4 +1,6 @@
 import argparse
+import os.path
+
 from movie_app import MovieApp
 from storage.storage_json import StorageJson
 from storage.storage_csv import StorageCsv
@@ -15,8 +17,12 @@ def main():
     args = parser.parse_args()
     storage_file = args.storage_file
 
+    # Ensures generated storage file is saved in 'data' dir
+    storage_file = os.path.join("data", storage_file)
+
+    # Extension-based storage
     if storage_file.endswith('.json'):
-        storage = StorageJson(storage_file)  # Extension-based storage
+        storage = StorageJson(storage_file)
     elif storage_file.endswith('.csv'):
         storage = StorageCsv(storage_file)
     else:
