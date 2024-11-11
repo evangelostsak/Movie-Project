@@ -32,8 +32,8 @@ class StorageCsv(IStorage):
                                     "rating": float(row.get("rating", 0.0))
 
                                 }
-
         except FileNotFoundError:
+
             print("Error loading movie database")
         return movies
 
