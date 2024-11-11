@@ -29,24 +29,25 @@ class StorageCsv(IStorage):
                             if title:
                                 movies[title] = {
                                     "year": int(row.get("year", 0)),
-                                    "rating": float(row.get("rating", 0.0))
-
+                                    "rating": float(row.get("rating", 0.0)),
+                                    "poster": row.get("poster", "")
                                 }
+            return movies
         except FileNotFoundError:
-
             print("Error loading movie database")
-        return movies
+        return {}
 
     def save_movies(self, data):
         """Saves the movie database to CSV file"""
         with open(self.file_path, mode='w', newline='') as file:
-            fieldnames = ["title", "year", "rating"]
+            fieldnames = ["title", "year", "rating", "poster"]
             writer = csv.DictWriter(file, fieldnames=fieldnames)
             writer.writeheader()
             for title, details in data.items():
                 writer.writerow({"title": title,
                                  "year": details["year"],
-                                 "rating": details["rating"]
+                                 "rating": details["rating"],
+                                 "poster": details["poster"]
                                  })
 
     def list_movies(self):
