@@ -40,7 +40,8 @@ class MovieApp:
                 "title": movie_data.get("Title"),
                 "year": movie_data.get("Year"),
                 "rating": float(movie_data.get("imdbRating", 0)),
-                "poster": movie_data.get("Poster")
+                "poster": movie_data.get("Poster"),
+                "link": movie_data.get("imdbID")
             }
             return movie_details
 
@@ -77,7 +78,8 @@ class MovieApp:
                         movie_details["title"],
                         movie_details["year"],
                         movie_details["rating"],
-                        movie_details["poster"]
+                        movie_details["poster"],
+                        movie_details["link"]
                         )
                     print(f"\nMovie {title} successfully added to the database")
                     break
@@ -94,10 +96,9 @@ class MovieApp:
     def _update_movie(self):
         """Update the rating of an existing movie in the database"""
 
-        update_title = input("Which movie shall be updated? ")
-
-        update_rating = float(input("Please enter the updated rating: "))
-        self._storage.update_movie(update_title, update_rating)
+        title = input(f"Which movie shall be updated?: ")
+        note = input(f"Please enter a note for '{title}': ")
+        self._storage.update_movie(title, note)
 
     def _movie_stats(self):
         """Showing the user the statistics of the movie database such as
@@ -192,19 +193,22 @@ class MovieApp:
 
             movies = self._storage.list_movies()
             movie_grid_html = ""
-            for title, details in movies.items():  # Generating the movie grid
-                movie_html = f"""
-            <li>
-                <div class="movie">
-                    <img class="movie-poster" src="{details['poster']}" alt="Poster for {title}">
-                    <div class="movie-title">{title}</div>
-                    <div class="movie-year">Year: {details['year']}</div>
-                    <div class="movie-year">Rating: {details['rating']}</div>
-                </div>
-            </li>
-            """
-                movie_grid_html += movie_html
-
+            for title, movie in movies.items():
+                note = movie["note"]  # generating the note
+                imdb_link = f"https://www.imdb.com/title/{movie["link"]}"  # Generating the imdb link
+                movie_grid_html += f"""
+                    <li>
+                        <div class="movie">
+                            <a href="{imdb_link}" target="_blank">
+                            <img src="{movie['poster']}" alt="{title}" class="movie-poster" title="{note}">
+                            </a>
+                            <div class="movie-title">{title}</div>
+                            <div class="movie-year">{movie['year']}</div>
+                            <div class="movie-rating">{movie['rating']}</div>
+                        </div>
+                    </li>
+                """
+                # replacing the templates
                 show_content_html = template.replace("__TEMPLATE_TITLE__", "Movie Project")
                 show_content_html = show_content_html.replace("__TEMPLATE_MOVIE_GRID__", movie_grid_html)
 
